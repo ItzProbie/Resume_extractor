@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF</title>
+</head>
+<body>
+    <h2>Upload a PDF File</h2>
+    <form id="pdfForm">
+        <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required>
+        <button type="submit">Upload and Parse</button>
+    </form>
+    <pre id="output"></pre>
+
+    <script>
+        document.getElementById('pdfForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const fileInput = document.getElementById('pdfFile');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('pdf', file);
+
+            try {
+                const response = await fetch('/upload-pdf', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                document.getElementById('output').textContent = 
+                    `PDF Info: ${JSON.stringify(result.info, null, 2)}\n\nParsed Content:\n${result.content}`;
+            } catch (error) {
+                document.getElementById('output').textContent = 'Error uploading or parsing the file.';
+            }
+        });
+    </script>
+</body>
+</html>
